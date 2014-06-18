@@ -1,0 +1,18 @@
+{
+  "name": "rtc-cards",
+  "version": "0.1.0",
+  "description": "Play cards in a browser, p2p",
+  "main": "index.js",
+  "dependencies": {
+    "crdt": "~3.6.4",
+    "rtc-mesh": "~0.6.0",
+    "rtc-quickconnect": "~1.0.4"
+  },
+  "keywords": [
+    "cards",
+    "webrtc",
+    "sandbox"
+  ],
+  "author": "Charles Lehner (http://celehner.com/)",
+  "license": "Fair"
+}

@@ -1,0 +1,62 @@
+body {
+	width: 668px;
+	height: 400px;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	font-family: sans-serif;
+}
+
+.options-bar {
+	box-sizing: border-box;
+	padding: .5em;
+	background-color: #860;
+	color: white;
+}
+
+.card-table {
+	box-sizing: border-box;
+	position: relative;
+	height: 378px;
+	border: 1.5em dotted black;
+	background-color: #00aa00;
+	font-size: 12px;
+}
+
+.card {
+	position: absolute;
+	background-color: #ccc;
+	transition: transform 0.25s;
+	-webkit-transition: transform 0.25s;
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+}
+
+.front, .back {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 0;
+	backface-visibility: hidden;
+	-webkit-backface-visibility: hidden;
+}
+
+.back {
+	transform: rotateY(180deg);
+	-webkit-transform: rotateY(180deg);
+}
+
+.faceup {
+	-webkit-transform: rotateY(180deg);
+	transform: rotateY(180deg);
+}
+
+.faceup .back {
+	display: none;
+}
+

@@ -1,0 +1,11 @@
+{
+	"regular": {
+		"size": [73, 97],
+		"src": "images/cards.png",
+		"backs": {
+			"blue": "images/bluecard.png",
+			"red": "images/redcard.png",
+			"green": "images/greencard.png"
+		}
+	}
+}
