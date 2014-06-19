@@ -1,19 +1,19 @@
-var quickconnect = require('rtc-quickconnect');
-var mesh = require('rtc-mesh');
 var Doc = require('crdt').Doc;
 var CardTable = require('./app').CardTable;
+var reconnectWS = require('reconnect-ws');
+
+var model = new Doc();
+
+var reconn = reconnectWS(function (stream) {
+	console.log('connected to ws');
+	stream.pipe(model.createStream()).pipe(stream);
+}).connect('ws://localhost:8082/');
 
 document.addEventListener('DOMContentLoaded', function() {
-	var qc = quickconnect('http://celehner.com:3000/', {
-		room: 'rtc-cards'
-	});
-
-	var model = mesh(qc, { model: new Doc() });
 	var table = new CardTable(document.body, model);
 	window.table = table;
-	table.setSynced(true);
+	table.setSynced(false);
 
-	qc.on('channel:opened', function() {
-		table.setSynced(false);
-	});
+	reconn.on('connect', table.setSynced.bind(table, true));
+	reconn.on('disconnect', table.setSynced.bind(table, false));
 }, false);

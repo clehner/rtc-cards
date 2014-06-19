@@ -2,16 +2,20 @@
   "name": "rtc-cards",
   "version": "0.1.0",
   "description": "Play cards in a browser, p2p",
-  "main": "index.js",
+  "main": "server.js",
+  "browser": "index.js",
   "dependencies": {
     "crdt": "~3.6.4",
-    "rtc-mesh": "~0.6.0",
-    "rtc-quickconnect": "~1.0.4"
+    "ws": "^0.4.31",
+    "websocket-stream": "^0.5.1",
+    "reconnect-ws": "0.0.0",
+    "ecstatic": "^0.5.3"
   },
   "devDependencies": {
     "watchify": "^0.10.2",
     "browserify": "^4.1.11",
-    "uglify-js": "^2.4.14"
+    "uglify-js": "^2.4.14",
+    "nodemon": "^1.2.0"
   },
   "keywords": [
     "cards",
@@ -21,7 +25,9 @@
   "author": "Charles Lehner (http://celehner.com/)",
   "license": "Fair",
   "scripts": {
-    "watch": "watchify index.js -o bundle.js --debug --verbose",
-    "build": "browserify index.js | uglifyjs -mc > bundle.js"
+    "watch-js": "watchify index.js -o bundle.js --debug --verbose",
+    "watch-server": "nodemon --watch server.js server.js",
+    "watch": "npm run watch-js & npm run watch-server",
+    "build": "browserify index.js | uglifyjs -mc > bundle.js && wc -c bundle.js"
   }
 }
