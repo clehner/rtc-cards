@@ -7,14 +7,21 @@ function CardTable(el, doc) {
 	this.cards = [];
 	this.decks = [];
 
+	this.doc.on('sync', this.setSynced.bind(this, true));
+
 	this.decksSet = this.doc.createSet('type', 'deck');
 	this.decksSet.on('add', this.onDeckRowAdded.bind(this));
+	this.decksSet.on('removed', console.log.bind(console, 'removed deck'));
 
+	this.optionsBarEl = el.querySelector('.options-bar');
+	this.loaderEl = el.querySelector('.loader');
 	this.cardsEl = el.querySelector('.card-table');
 	el.querySelector('.add-deck').onclick = this.onClickAddDeck.bind(this);
 
+	this.decksEl = el.querySelector('.decks');
+
 	this.dragController = new DragController(this.cardsEl, this);
-	this.el.oncontextmenu = this.onRightClick.bind(this);
+	this.cardsEl.oncontextmenu = this.onRightClick.bind(this);
 }
 
 CardTable.prototype.getCardAtEl = function(el) {
@@ -31,7 +38,9 @@ CardTable.prototype.addCard = function(card) {
 CardTable.prototype.onDeckRowAdded = function(row) {
 	var deck = new Deck(row, this);
 	this.decks.push(deck);
-	row.on('removed', this.removeDeck.bind(this, row));
+	this.decksEl.appendChild(deck.el);
+	// 'removed' doesn't seem to fire. detect removal in onChange
+	//row.on('removed', this.removeDeck.bind(this, deck));
 };
 
 CardTable.prototype.onClickAddDeck = function() {
@@ -39,7 +48,7 @@ CardTable.prototype.onClickAddDeck = function() {
 		x: Math.random() * 200,
 		y: Math.random() * 100,
 		type: 'regular',
-		backColor: 'red'
+		backColor: ['red', 'green', 'blue'][Math.floor(Math.random()*3)]
 	});
 };
 
@@ -61,6 +70,7 @@ CardTable.prototype.removeCard = function(card) {
 CardTable.prototype.removeDeck = function(deck) {
 	var i = this.decks.indexOf(deck);
 	if (i < 0) return;
+	this.decksEl.removeChild(deck.el);
 	this.decks.splice(i, 1);
 };
 
@@ -72,6 +82,13 @@ CardTable.prototype.onDragStart = function(e) {
 		card.onDragStart(e);
 		return;
 	}
+};
+
+CardTable.prototype.setSynced = function(synced) {
+	// synced = whether we think the cards are in a stable state
+	this.synced = synced;
+	this.el.classList.add(synced ? 'synced' : 'syncing');
+	this.el.classList.remove(synced ? 'syncing' : 'synced');
 };
 
 module.exports = {

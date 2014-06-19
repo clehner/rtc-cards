@@ -47,6 +47,9 @@ Card.prototype.onChange = function(change) {
 	if (change.faceup != null) {
 		this.setFaceup(change.faceup);
 	}
+	if (change.held != null) {
+		this.setHeld(change.held);
+	}
 };
 
 Card.prototype.updateFace = function() {
@@ -77,11 +80,30 @@ Card.prototype.setZ = function(z) {
 Card.prototype.setFaceup = function(faceup) {
 	this.faceup = faceup;
 	this.updateClassname();
+	if (this.table.synced) {
+		// If synced, render the animation and schedule the opacity change.
+		// Change the opacity at the apex of the flip transition, so the sides
+		// appear to change seamlessly.
+		setTimeout(this.updateOpacity.bind(this), 125);
+	} else {
+		// If not synced, change opacity immediately.
+		this.updateOpacity();
+	}
+};
+
+Card.prototype.setHeld = function(held) {
+	this.held = held;
+	this.updateClassname();
 };
 
 Card.prototype.updateClassname = function() {
 	this.el.className = 'card card-' + this.deck.id +
-		(this.faceup ? ' faceup' : '');
+		(this.faceup ? ' faceup' : ' facedown') +
+		(this.held ? ' held' : '');
+};
+
+Card.prototype.updateOpacity = function() {
+	this.backEl.style.opacity = this.faceup ? 0 : 1;
 };
 
 Card.prototype.flip = function() {

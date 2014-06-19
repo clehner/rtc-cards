@@ -1,3 +1,5 @@
+/* app */
+
 body {
 	width: 668px;
 	height: 400px;
@@ -8,31 +10,88 @@ body {
 	bottom: 0;
 	margin: auto;
 	font-family: sans-serif;
+	font-size: 12px;
 }
 
 .options-bar {
 	box-sizing: border-box;
-	padding: .5em;
+	padding: 1ex;
 	background-color: #860;
 	color: white;
+}
+
+.loader {
+	float: right;
+	font-size: 2em;
+	animation: spinning 1s linear infinite;
+	-webkit-animation: spinning 1s linear infinite;
+}
+
+.syncing {
+	cursor: progress;
+}
+
+.synced .loader {
+	display: none;
+}
+
+@keyframes spinning {
+	from {
+		transform: rotate(360deg);
+	}
+	to {
+		transform: rotate(0deg);
+	}
+}
+
+@-webkit-keyframes spinning {
+	0% {
+		-webkit-transform: rotate(360deg);
+	}
+
+	100% {
+		-webkit-transform: rotate(0deg);
+	}
+}
+
+/* decks */
+
+.decks {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.deck {
+	min-width: 1ex;
+	max-height: 2em;
+	background-color: #864;
+	display: inline-block;
+	margin-left: 1ex;
+	cursor: pointer;
 }
 
 .card-table {
 	box-sizing: border-box;
 	position: relative;
 	height: 378px;
-	border: 1.5em dotted black;
 	background-color: #00aa00;
-	font-size: 12px;
 }
+
+/* cards */
 
 .card {
 	position: absolute;
 	background-color: #ccc;
-	transition: transform 0.25s;
-	-webkit-transition: transform 0.25s;
-	-webkit-transform-style: preserve-3d;
-	transform-style: preserve-3d;
+	transform: rotateY(0deg);
+	-webkit-transform: rotateY(0deg);
+}
+.synced .card {
+	transition: transform linear .25s;
+	-webkit-transition: -webkit-transform linear .25s;
+}
+
+.card.held .front {
+	outline: 5px solid rgba(255, 255, 0, 0.75);
 }
 
 .front, .back {
@@ -42,21 +101,14 @@ body {
 	width: 100%;
 	height: 100%;
 	z-index: 0;
-	backface-visibility: hidden;
-	-webkit-backface-visibility: hidden;
 }
 
-.back {
+.front {
 	transform: rotateY(180deg);
 	-webkit-transform: rotateY(180deg);
 }
 
 .faceup {
-	-webkit-transform: rotateY(180deg);
 	transform: rotateY(180deg);
+	-webkit-transform: rotateY(180deg);
 }
-
-.faceup .back {
-	display: none;
-}
-

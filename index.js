@@ -7,7 +7,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	var qc = quickconnect('http://celehner.com:3000/', {
 		room: 'rtc-cards'
 	});
+
 	var model = mesh(qc, { model: new Doc() });
 	var table = new CardTable(document.body, model);
 	window.table = table;
+	table.setSynced(true);
+
+	qc.on('channel:opened', function() {
+		table.setSynced(false);
+	});
 }, false);
