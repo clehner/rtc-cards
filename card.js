@@ -94,6 +94,11 @@ Card.prototype.setFaceup = function(faceup) {
 Card.prototype.setHeld = function(held) {
 	this.held = held;
 	this.updateClassname();
+	if (held) {
+		this.table.cardsHeld[this.row.id] = this;
+	} else {
+		delete this.table.cardsHeld[this.row.id];
+	}
 };
 
 Card.prototype.updateClassname = function() {

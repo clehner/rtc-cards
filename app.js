@@ -1,4 +1,5 @@
 var DragController = require('./drag-controller');
+var KeyController = require('./key-controller');
 var Deck = require('./deck');
 
 function CardTable(el, doc) {
@@ -6,6 +7,7 @@ function CardTable(el, doc) {
 	this.doc = doc;
 	this.cards = [];
 	this.decks = [];
+	this.cardsHeld = {};
 
 	this.doc.on('sync', this.onSync.bind(this));
 
@@ -21,7 +23,7 @@ function CardTable(el, doc) {
 	this.decksEl = el.querySelector('.decks');
 
 	this.dragController = new DragController(this.cardsEl, this);
-	this.cardsEl.oncontextmenu = this.onRightClick.bind(this);
+	this.keyController = new KeyController(window, this);
 }
 
 CardTable.prototype.getCardAtEl = function(el) {
@@ -52,11 +54,13 @@ CardTable.prototype.onClickAddDeck = function() {
 	});
 };
 
-CardTable.prototype.onRightClick = function(e) {
-	e.preventDefault();
-	var card = this.getCardAtEl(e.target);
-	if (card) {
-		card.flip();
+CardTable.prototype.onKeyDown = {
+	SPACE: function(e) {
+		e.preventDefault();
+		for (var id in this.cardsHeld) {
+			var card = this.cardsHeld[id];
+			card.flip();
+		}
 	}
 };
 
