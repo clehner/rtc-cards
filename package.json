@@ -8,11 +8,20 @@
     "rtc-mesh": "~0.6.0",
     "rtc-quickconnect": "~1.0.4"
   },
+  "devDependencies": {
+    "watchify": "^0.10.2",
+    "browserify": "^4.1.11",
+    "uglify-js": "^2.4.14"
+  },
   "keywords": [
     "cards",
     "webrtc",
     "sandbox"
   ],
   "author": "Charles Lehner (http://celehner.com/)",
-  "license": "Fair"
+  "license": "Fair",
+  "scripts": {
+    "watch": "watchify index.js -o bundle.js --debug --verbose",
+    "build": "browserify index.js | uglifyjs -mc > bundle.js"
+  }
 }
