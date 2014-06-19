@@ -7,7 +7,7 @@ function CardTable(el, doc) {
 	this.cards = [];
 	this.decks = [];
 
-	this.doc.on('sync', this.setSynced.bind(this, true));
+	this.doc.on('sync', this.onSync.bind(this));
 
 	this.decksSet = this.doc.createSet('type', 'deck');
 	this.decksSet.on('add', this.onDeckRowAdded.bind(this));
@@ -82,6 +82,11 @@ CardTable.prototype.onDragStart = function(e) {
 		card.onDragStart(e);
 		return;
 	}
+};
+
+CardTable.prototype.onSync = function() {
+	// add extra delay to make sure initial updates don't get animated
+	setTimeout(this.setSynced.bind(this, true), 125);
 };
 
 CardTable.prototype.setSynced = function(synced) {
