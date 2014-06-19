@@ -40,6 +40,7 @@ function DragController(element, options) {
 	var onDragEnd = options.onDragEnd;
 	var context = options;
 	if (options.onActivate) options.onActivate();
+	var which;
 
 	var lastX, lastY;
 	var offsetX, offsetY;
@@ -65,6 +66,8 @@ function DragController(element, options) {
 	}
 
 	function onMouseUp(e) {
+		if (e.which != which) return;
+		which = 0;
 		document.removeEventListener("mouseup", onMouseUp, false);
 		document.removeEventListener("mousemove", onMouseMove, true);
 		correctEvent(e);
@@ -82,6 +85,10 @@ function DragController(element, options) {
 	}
 
 	function onMouseDown(e) {
+		if (which && which != e.which) {
+			return;
+		}
+		which = e.which;
 		if (e.touches) {
 			e.preventDefault();
 			document.addEventListener("touchmove", onMouseMove, true);
@@ -92,8 +99,6 @@ function DragController(element, options) {
 			document.addEventListener("mouseup", onMouseUp, false);
 		}
 
-		// ignore right click
-		document.addEventListener("contextmenu", onMouseUp, false);
 		calculateOffsets();
 		correctEvent(e);
 		if (onDragStart) onDragStart.call(context, e, self);

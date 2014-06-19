@@ -24,6 +24,7 @@ function CardTable(el, doc) {
 
 	this.dragController = new DragController(this.cardsEl, this);
 	this.keyController = new KeyController(window, this);
+	this.cardsEl.oncontextmenu = this.onRightClick.bind(this);
 }
 
 CardTable.prototype.getCardAtEl = function(el) {
@@ -54,12 +55,20 @@ CardTable.prototype.onClickAddDeck = function() {
 	});
 };
 
+CardTable.prototype.onRightClick = function(e) {
+	e.preventDefault();
+	for (var id in this.cardsHeld) {
+		var card = this.cardsHeld[id];
+		card.flip();
+	}
+};
+
 CardTable.prototype.onKeyDown = {
 	SPACE: function(e) {
 		e.preventDefault();
 		for (var id in this.cardsHeld) {
 			var card = this.cardsHeld[id];
-			card.flip();
+			card.setZ(0);
 		}
 	}
 };
