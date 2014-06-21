@@ -3,6 +3,8 @@ var WebSocketServer = require('ws').Server;
 var WebsocketStream = require('websocket-stream');
 var ecstatic   = require('ecstatic');
 var Doc = require('crdt').Doc;
+var Scuttlebucket = require('scuttlebucket');
+var RRTC = require('r-rtc');
 
 var server = http.createServer(ecstatic({
 	root: '.',
@@ -14,8 +16,17 @@ console.log('server listening on :8082');
 
 var docs = {};
 
+function newDoc() {
+	/*
+	return new Scuttlebucket()
+		.add('signalling', new RRTC())
+		.add('cards', new Doc());
+		*/
+	return new RRTC();
+}
+
 function getDoc(url) {
-	return docs[url] || (docs[url] = new Doc());
+	return docs[url] || (docs[url] = newDoc());
 }
 
 var wss = new WebSocketServer({
