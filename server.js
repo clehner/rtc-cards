@@ -8,25 +8,27 @@ var RRTC = require('r-rtc');
 
 var server = http.createServer(ecstatic({
 	root: '.',
-	baseDir: '/',
-	autoIndex: true
+	baseDir: '/'
 }));
 server.listen(8082, '::');
 console.log('server listening on :8082');
 
 var docs = {};
 
-function newDoc() {
-	/*
-	return new Scuttlebucket()
-		.add('signalling', new RRTC())
-		.add('cards', new Doc());
-		*/
-	return new RRTC();
+function newDoc(url) {
+	if (!url.indexOf('/signalling/')) {
+		return new RRTC();
+	} else if (!url.indexOf('/cards/')) {
+		return new Doc();
+	} else if (!url.indexOf('/cards+signalling/')) {
+		return new Scuttlebucket()
+			.add('signalling', new RRTC())
+			.add('cards', new Doc());
+	}
 }
 
 function getDoc(url) {
-	return docs[url] || (docs[url] = newDoc());
+	return docs[url] || (docs[url] = newDoc(url));
 }
 
 var wss = new WebSocketServer({

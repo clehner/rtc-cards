@@ -5,6 +5,7 @@ var RTCChannelStream = require('rtc-dcstream');
 var Scuttlebucket = require('scuttlebucket');
 var RRTC = require('r-rtc');
 
+var table;
 var tableModel = new Doc();
 var signalling = new RRTC();
 
@@ -13,23 +14,33 @@ var model = new Scuttlebucket()
 	.add('cards', tableModel);
 window.model = model;
 
+/*
+signalling.on('old_data', function(d) {
+	console.log('old data', d);
+});
+*/
+
 signalling.on('peerstate', function(id, state) {
 	if (state == 'active') {
-		table.setSynced(false);
+		//table.setSynced(false);
 		signalling.connect(id);
 	}
 });
 
+var streams = 0;
+
 signalling.on('peerconnection', function(id, peerConnection) {
-	console.debug('got peer connection', id, peerConnection);
+	//console.debug('got peer connection', id, peerConnection);
 	var dataChannel = peerConnection.createDataChannel('doc', {
 		id: 'doc',
 		negotiated: true
 	});
+	//table.setSynced(false);
 
 	dataChannel.addEventListener('open', function() {
-		console.debug('channel opened');
-		table.setSynced(true);
+		//console.debug('channel opened');
+		console.log('stream', ++streams, 'opened', stream);
+		//table.setSynced(true);
 	}, false);
 
 	dataChannel.addEventListener('error', function(e) {
@@ -39,38 +50,35 @@ signalling.on('peerconnection', function(id, peerConnection) {
 	var stream = new RTCChannelStream(dataChannel);
 	stream.pipe(model.createStream()).pipe(stream);
 	stream.on('error', function(e) {
-		console.log('stream error', e);
+		console.log('stream error', e, stream);
 	});
 	stream.on('close', function() {
-		console.log('stream closed');
+		console.log('stream', --streams, 'closed', stream);
 	});
 });
 
 signalling.setState('active');
 
-var reconn = reconnectWS(function(stream) {
-	console.log('connected to ws');
-	stream.pipe(signalling.createStream()).pipe(stream);
-	/*
-	var i = 0;
-	stream.on('data', function(data) {
-		i++;
-		//console.log(i, 'message', data);
-		if (data == "\"SYNC\"\n") {
-			console.log('sync', i, 'messages');
-		}
-	});
-	*/
-}).connect('ws://localhost:8082/7');
+var host = location.protocol.replace('http', 'ws') + location.host;
 
-//model.createStream().on('data', console.log.bind(console, 'model data'));
+reconnectWS(function(stream) {
+	stream.pipe(tableModel.createStream()).pipe(stream);
+}).connect(host + '/cards/2');
+
+reconnectWS(function(stream) {
+	stream.pipe(signalling.createStream()).pipe(stream);
+}).connect(host + '/signalling/2');
+
+/*
+reconnectWS(function(stream) {
+	stream.pipe(model.createStream()).pipe(stream);
+}).connect(host + '/cards+signalling/2');
+*/
+
 console.log('my id', signalling.id);
 
 document.addEventListener('DOMContentLoaded', function() {
-	var table = new CardTable(document.body, tableModel);
+	table = new CardTable(document.body, tableModel);
 	window.table = table;
-	table.setSynced(false);
-
-	//reconn.on('connect', table.setSynced.bind(table, true));
-	reconn.on('disconnect', table.setSynced.bind(table, false));
+	table.setSynced(true);
 }, false);
