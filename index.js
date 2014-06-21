@@ -59,20 +59,23 @@ signalling.on('peerconnection', function(id, peerConnection) {
 
 signalling.setState('active');
 
-var host = location.protocol.replace('http', 'ws') + location.host;
+var origin = location.origin.replace(/^http/, 'ws');
+var root = origin + location.pathname.replace(/\/[^\/]*$/, '');
 
 reconnectWS(function(stream) {
 	stream.pipe(tableModel.createStream()).pipe(stream);
-}).connect(host + '/cards/2');
+}).connect(root + '/cards/2');
 
+/*
 reconnectWS(function(stream) {
 	stream.pipe(signalling.createStream()).pipe(stream);
-}).connect(host + '/signalling/2');
+}).connect(root + '/signalling/2');
+*/
 
 /*
 reconnectWS(function(stream) {
 	stream.pipe(model.createStream()).pipe(stream);
-}).connect(host + '/cards+signalling/2');
+}).connect(root + '/cards+signalling/2');
 */
 
 console.log('my id', signalling.id);
