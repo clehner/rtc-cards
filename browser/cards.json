@@ -1,0 +1,20 @@
+{
+	"regular": {
+		"size": [73, 97],
+		"src": "static/images/cards.png",
+		"backs": {
+			"blue": {
+				"src": "static/images/bluecard.png",
+				"icon": "static/images/smallbluedeck.png"
+			},
+			"red": {
+				"src": "static/images/redcard.png",
+				"icon": "static/images/smallreddeck.png"
+			},
+			"green": {
+				"src": "static/images/greencard.png",
+				"icon": "static/images/smallgreendeck.png"
+			}
+		}
+	}
+}

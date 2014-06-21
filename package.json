@@ -2,8 +2,8 @@
   "name": "rtc-cards",
   "version": "0.1.0",
   "description": "Play cards in a browser, p2p",
-  "main": "server.js",
-  "browser": "index.js",
+  "main": "server/index.js",
+  "browser": "browser/index.js",
   "repository": {
     "url": "git://github.com/clehner/rtc-cards.git"
   },
@@ -31,9 +31,9 @@
   "author": "Charles Lehner (http://celehner.com/)",
   "license": "Fair",
   "scripts": {
-    "watch-js": "watchify index.js -o bundle.js --debug --verbose",
-    "watch-server": "nodemon --watch server.js server.js",
+    "watch-js": "watchify browser/index.js -o static/bundle.js --debug --verbose",
+    "watch-server": "nodemon --watch server server/index.js",
     "watch": "npm run watch-js & npm run watch-server",
-    "build": "browserify index.js | uglifyjs -mc > bundle.js && wc -c bundle.js"
+    "build": "browserify browser/index.js | uglifyjs -mc > static/bundle.js && wc -c static/bundle.js"
   }
 }
