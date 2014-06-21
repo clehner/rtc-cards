@@ -4,6 +4,9 @@
   "description": "Play cards in a browser, p2p",
   "main": "server.js",
   "browser": "index.js",
+  "repository": {
+    "url": "git://github.com/clehner/rtc-cards.git"
+  },
   "dependencies": {
     "crdt": "~3.6.4",
     "ws": "^0.4.31",
