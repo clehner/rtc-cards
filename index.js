@@ -15,6 +15,7 @@ window.model = model;
 
 signalling.on('peerstate', function(id, state) {
 	if (state == 'active') {
+		table.setSynced(false);
 		signalling.connect(id);
 	}
 });
@@ -28,6 +29,7 @@ signalling.on('peerconnection', function(id, peerConnection) {
 
 	dataChannel.addEventListener('open', function() {
 		console.debug('channel opened');
+		table.setSynced(true);
 	}, false);
 
 	dataChannel.addEventListener('error', function(e) {
@@ -69,6 +71,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	window.table = table;
 	table.setSynced(false);
 
-	reconn.on('connect', table.setSynced.bind(table, true));
+	//reconn.on('connect', table.setSynced.bind(table, true));
 	reconn.on('disconnect', table.setSynced.bind(table, false));
 }, false);
