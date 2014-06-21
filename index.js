@@ -1,7 +1,7 @@
 var Doc = require('crdt').Doc;
 var CardTable = require('./app').CardTable;
 var reconnectWS = require('reconnect-ws');
-var RTCDataStream = require('rtc-data-stream');
+var RTCChannelStream = require('rtc-dcstream');
 var Scuttlebucket = require('scuttlebucket');
 var RRTC = require('r-rtc');
 
@@ -36,7 +36,7 @@ signalling.on('peerconnection', function(id, peerConnection) {
 		console.error('channel error', e);
 	}, false);
 
-	var stream = new RTCDataStream(dataChannel);
+	var stream = new RTCChannelStream(dataChannel);
 	stream.pipe(model.createStream()).pipe(stream);
 	stream.on('error', function(e) {
 		console.log('stream error', e);
