@@ -1,17 +1,10 @@
 var http = require('http');
 var WebSocketServer = require('ws').Server;
 var WebsocketStream = require('websocket-stream');
-var ecstatic   = require('ecstatic');
+var statico = require('./statico');
 var Doc = require('crdt').Doc;
 var Scuttlebucket = require('scuttlebucket');
 var RRTC = require('r-rtc');
-
-var server = http.createServer(ecstatic({
-	root: '.',
-	baseDir: '/'
-}));
-server.listen(8082, '::');
-console.log('server listening on :8082');
 
 var docs = {};
 
@@ -30,6 +23,27 @@ function newDoc(url) {
 function getDoc(url) {
 	return docs[url] || (docs[url] = newDoc(url));
 }
+
+var server = http.createServer(statico(function(url, req, res) {
+	console.log('req for', url, req.url);
+	if (!url.indexOf('/cards/')) {
+		var stream = getDoc(url).createReadStream();
+		stream.pipe(res);
+		stream.on('data', function(data) {
+			if (data == "\"SYNC\"\n") {
+				this.end();
+			}
+		});
+	} else if (url == '/') {
+		statico.serveFile('index.html', res);
+	} else if (!url.indexOf('/room/')) {
+		statico.serveFile('app.html', res);
+	} else {
+		statico.serve404(res);
+	}
+}));
+server.listen(8082, '::');
+console.log('server listening on :8082');
 
 var wss = new WebSocketServer({
 	server: server,

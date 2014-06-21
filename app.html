@@ -3,11 +3,15 @@
 <head>
 	<meta charset="UTF-8">
 	<title>RTC Cards</title>
+	<base href="../">
 	<link rel="stylesheet" type="text/css" href="static/cards.css">
+	<script src="static/bundle.js"></script>
 </head>
 <body>
 	<div class="options-bar">
-		<a href="room/1">Join a room</a>
+		<button class="add-deck">Add deck</button>
+		<div class="decks"></div>
+		<div class="loader" title="Loading...">↺</div>
 	</div>
 	<div class="card-table">
 	</div>

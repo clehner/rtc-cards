@@ -12,7 +12,6 @@
     "ws": "^0.4.31",
     "websocket-stream": "^0.5.1",
     "reconnect-ws": "0.0.0",
-    "ecstatic": "^0.5.3",
     "scuttlebucket": "^0.2.3",
     "r-rtc": "~0.2.0",
     "rtc-dcstream": "^0.4.3"

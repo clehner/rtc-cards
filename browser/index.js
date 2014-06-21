@@ -59,12 +59,31 @@ signalling.on('peerconnection', function(id, peerConnection) {
 
 signalling.setState('active');
 
-var origin = location.origin.replace(/^http/, 'ws');
-var root = origin + location.pathname.replace(/\/[^\/]*$/, '');
+var href = location.origin + location.pathname;
+var m = href.match(/^http(.*)\/room\/([^.])*/);
+if (!m) {
+	throw new Error('404 Not found');
+}
+var root = 'http' + m[1];
+var wsRoot = 'ws' + m[1];
+var roomId = m[2];
 
-reconnectWS(function(stream) {
+var ws = reconnectWS(function(stream) {
 	stream.pipe(tableModel.createStream()).pipe(stream);
-}).connect(root + '/cards/2');
+});
+
+// bootstrap using xhr for fast load time
+var path = '/cards/' + roomId;
+var writeStream = tableModel.createStream();
+var xhr = new XMLHttpRequest();
+xhr.open('get', root + path, true);
+xhr.onload = function() {
+	writeStream.write(xhr.responseText);
+
+	// establish duplex connection with websocket
+	ws.connect(wsRoot + path);
+};
+xhr.send(null);
 
 /*
 reconnectWS(function(stream) {
