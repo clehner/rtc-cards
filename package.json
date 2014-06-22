@@ -14,7 +14,8 @@
     "reconnect-ws": "0.0.0",
     "scuttlebucket": "^0.2.3",
     "r-rtc": "~0.2.0",
-    "rtc-dcstream": "^0.4.3"
+    "rtc-dcstream": "^0.4.3",
+    "yargs": "^1.2.5"
   },
   "devDependencies": {
     "watchify": "^0.10.2",

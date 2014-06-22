@@ -1,3 +1,4 @@
+var fs = require('fs');
 var http = require('http');
 var WebSocketServer = require('ws').Server;
 var WebsocketStream = require('websocket-stream');
@@ -5,6 +6,8 @@ var statico = require('./statico');
 var Doc = require('crdt').Doc;
 var Scuttlebucket = require('scuttlebucket');
 var RRTC = require('r-rtc');
+
+var argv = require('yargs').argv;
 
 var docs = {};
 
@@ -42,8 +45,22 @@ var server = http.createServer(statico(function(url, req, res) {
 		statico.serve404(res);
 	}
 }));
-server.listen(8082, '::');
-console.log('server listening on :8082');
+
+var sock = argv.socket;
+if (sock) {
+	fs.stat(sock, function(err) {
+		if (!err) { fs.unlinkSync(sock); }
+		server.listen(sock, function(){
+			fs.chmodSync(sock, '775');
+			console.log('server listening on', sock);
+		});
+	});
+} else {
+	var port = argv.port || 8082;
+	var host = argv.host || '::';
+	server.listen(port, host);
+	console.log('server listening on', host, port);
+}
 
 var wss = new WebSocketServer({
 	server: server,
