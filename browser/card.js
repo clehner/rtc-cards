@@ -41,9 +41,6 @@ Card.prototype.onChange = function(change) {
 	if (change.position) {
 		this.setPosition(change.position);
 	}
-	if (change.z != null) {
-		this.setZ(change.z);
-	}
 	if (change.faceup != null) {
 		this.setFaceup(change.faceup);
 	}
@@ -70,11 +67,8 @@ Card.prototype.setPosition = function(pos) {
 	style.top = this.y + 'px';
 	style.left = this.x + 'px';
 	style.zIndex = this.z;
-};
-
-Card.prototype.setZ = function(z) {
-	this.z = z;
-	this.el.style.zIndex = this.z;
+	this.frontEl.style.zIndex = this.z;
+	this.backEl.style.zIndex = this.z;
 };
 
 Card.prototype.setFaceup = function(faceup) {
@@ -132,7 +126,8 @@ Card.prototype.onDrag = function(e) {
 		var dy = e.pageY - this.prevMouse.pageY;
 		this.row.set('position', {
 			x: this.x + dx,
-			y: this.y + dy
+			y: this.y + dy,
+			z: this.z
 		});
 	}
 	this.prevMouse = e;

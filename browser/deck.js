@@ -111,9 +111,9 @@ Deck.add = function(doc, opt) {
 				rank: rank,
 				position: {
 					x: x + i * density,
-					y: y + i * density
+					y: y + i * density,
+					z: z + i
 				},
-				z: z + i,
 				held: false,
 				faceup: false
 			});

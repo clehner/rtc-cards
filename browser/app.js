@@ -33,6 +33,18 @@ CardTable.prototype.getCardAtEl = function(el) {
 	}
 };
 
+CardTable.prototype.getCardAtPoint = function(x, y) {
+	var cards = this.cards.filter(function(card) {
+		return x > card.x &&
+			y > card.y &&
+			(x <= card.x + card.deck.width) &&
+			(y <= card.y + card.deck.height);
+	});
+	return cards.length && cards.reduce(function(a, b) {
+		return a.z > b.z ? a : b;
+	});
+};
+
 CardTable.prototype.addCard = function(card) {
 	this.cards.push(card);
 	this.cardsEl.appendChild(card.el);
@@ -90,6 +102,7 @@ CardTable.prototype.removeDeck = function(deck) {
 CardTable.prototype.onDragStart = function(e) {
 	e.preventDefault();
 	var card = this.getCardAtEl(e.target);
+	//var card = this.getCardAtEl(e._x, e._y);
 	if (card) {
 		this.dragController.setBehavior(card);
 		card.onDragStart(e);
