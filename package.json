@@ -15,7 +15,8 @@
     "scuttlebucket": "^0.2.3",
     "r-rtc": "~0.2.0",
     "rtc-dcstream": "^0.4.3",
-    "yargs": "^1.2.5"
+    "yargs": "^1.2.5",
+    "debounce": "^1.0.0"
   },
   "devDependencies": {
     "watchify": "^0.10.2",

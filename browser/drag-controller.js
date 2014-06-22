@@ -1,35 +1,78 @@
-/*
-function calculateOffsets() {
-	var x = 0, y = 0;
-	for (var el = element; el; el = el.offsetParent) {
-		x += el.offsetLeft - el.scrollLeft;
-		y += el.offsetTop - el.scrollTop;
+
+function updateListeners(prev, next, map) {
+	for (var name in map) {
+		var listener = map[name];
+		if (next[name] && !prev[name]) {
+			listener[0].addEventListener(listener[1], listener[2], false);
+		} else if (prev[name] && !next[name]) {
+			listener[0].removeEventListener(listener[1], listener[2], false);
+		}
 	}
-	offsetX = x;
-	offsetY = y;
 }
 
-function DragController(el) {
-	this.el = el;
+function DragController(element, defaultBehavior) {
+	var self = this;
+	var behavior = 0;
+	var which;
+	var offsetX, offsetY;
+
+	function calculateOffsets(el) {
+		offsetX = offsetY = 0;
+		for (; el && el != element; el = el.offsetParent) {
+			offsetX += el.offsetLeft - el.scrollLeft;
+			offsetY += el.offsetTop - el.scrollTop;
+		}
+	}
+
+	function correctEvent(e) {
+		// Add coords relative to element
+		e._x = e.offsetX + offsetX;
+		e._y = e.offsetY + offsetY;
+	}
+
+	function onMouseDown(e) {
+		if (which && which != e.which) {
+			return;
+		}
+		which = e.which;
+
+		calculateOffsets(e.target);
+		correctEvent(e);
+
+		var result = behavior.dragStart(e, self);
+		if (result) setBehavior(result);
+	}
+
+	function onMouseMove(e) {
+		correctEvent(e);
+		var result = behavior.drag(e, self);
+		if (result) setBehavior(result);
+	}
+
+	function onMouseUp(e) {
+		if (e.which != which) return;
+		which = 0;
+		correctEvent(e);
+		var result = behavior.dragEnd(e, self);
+		setBehavior(result || defaultBehavior);
+	}
+
+	function setBehavior(newBehavior) {
+		updateListeners(behavior, newBehavior, {
+			dragStart: [element, 'mousedown', onMouseDown],
+			drag: [document, 'mousemove', onMouseMove],
+			dragEnd: [document, 'mouseup', onMouseUp]
+		});
+		behavior = newBehavior;
+	}
+
+	this.setBehavior = setBehavior;
+	setBehavior(defaultBehavior);
 }
-DragController.prototype.mousedown = function(e) {
-};
-DragController.prototype.setBehavior = function(behavior, context) {
-	// unbind event listeners if needed
-	if (this.behavior && this.behavior.onDragStart) {
-		if (!behavior || !behavior.onDragStart) {
-			this.el.removeEventListener('mousedown', this.onMouseDown, false);
-		}
-		if (!behavior || this.behavior.onDrag && !behavior.onDrag) {
-			this.el.removeEventListener('mousedown', this.onMouseDown, false);
-		}
-	}
-	if (this.behavior && this.behavior.onDragStart && !behavior.) {
-	}
-	this.behavior = behavior;
-	this.context = context;
-};
-*/
+
+module.exports = DragController;
+
+/*
 
 function DragController(element, options) {
 	if (!element) return null;
@@ -83,11 +126,26 @@ function DragController(element, options) {
 		if (onDragEnd) onDragEnd.call(context, e, self);
 	}
 
+	this.setTempBehavior = function (opt) {
+	};
+}
+
+module.exports = DragController;
+
+function DragController(el, handler, context) {
+
 	function onMouseDown(e) {
 		if (which && which != e.which) {
 			return;
 		}
 		which = e.which;
+
+		if (!onDragStart) return;
+		calculateOffsets(e.target);
+		correctEvent(e);
+		var behavior = onDragStart.call(context, e, self);
+		if (!behavior) return;
+
 		if (e.touches) {
 			e.preventDefault();
 			document.addEventListener("touchmove", onMouseMove, true);
@@ -97,21 +155,9 @@ function DragController(element, options) {
 			document.addEventListener("mousemove", onMouseMove, true);
 			document.addEventListener("mouseup", onMouseUp, false);
 		}
-
-		calculateOffsets(e.target);
-		correctEvent(e);
-		if (onDragStart) onDragStart.call(context, e, self);
 	}
-	element.addEventListener("touchstart", onMouseDown, false);
-	element.addEventListener("mousedown", onMouseDown, false);
 
-	this.setBehavior = function (opt) {
-		onDragStart = opt.onDragStart;
-		onDrag = opt.onDrag;
-		onDragEnd = opt.onDragEnd;
-		context = opt;
-		if (opt.onActivate) opt.onActivate();
-	};
+	el.addEventListener("touchstart", onMouseDown, false);
+	el.addEventListener("mousedown", onMouseDown, false);
 }
-
-module.exports = DragController;
+*/

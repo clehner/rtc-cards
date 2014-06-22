@@ -1,6 +1,7 @@
 var DragController = require('./drag-controller');
 var KeyController = require('./key-controller');
 var Deck = require('./deck');
+var CardSelection = require('./selection');
 
 function CardTable(el, doc) {
 	this.el = el;
@@ -25,6 +26,8 @@ function CardTable(el, doc) {
 	this.dragController = new DragController(this.cardsEl, this);
 	this.keyController = new KeyController(window, this);
 	this.cardsEl.oncontextmenu = this.onRightClick.bind(this);
+
+	this.selection = new CardSelection(this, this.cardsEl);
 }
 
 CardTable.prototype.getCardAtEl = function(el) {
@@ -69,19 +72,21 @@ CardTable.prototype.onClickAddDeck = function() {
 
 CardTable.prototype.onRightClick = function(e) {
 	e.preventDefault();
-	for (var id in this.cardsHeld) {
-		var card = this.cardsHeld[id];
-		card.flip();
-	}
+	this.selection.flip();
 };
 
 CardTable.prototype.onKeyDown = {
 	SPACE: function(e) {
 		e.preventDefault();
+		/*
 		for (var id in this.cardsHeld) {
 			var card = this.cardsHeld[id];
 			card.setZ(0);
 		}
+		*/
+	},
+	f: function() {
+		this.selection.flip();
 	}
 };
 
@@ -99,15 +104,25 @@ CardTable.prototype.removeDeck = function(deck) {
 	this.decks.splice(i, 1);
 };
 
-CardTable.prototype.onDragStart = function(e) {
+CardTable.prototype.dragStart = function(e) {
 	e.preventDefault();
 	var card = this.getCardAtEl(e.target);
-	//var card = this.getCardAtEl(e._x, e._y);
-	if (card) {
-		this.dragController.setBehavior(card);
-		card.onDragStart(e);
-		return;
+	if (!card) {
+		// start selection box
+		if (!e.shiftKey) {
+			this.selection.clear();
+		}
+		return this.selection.dragSelect(e);
 	}
+	// move selection
+	if (card.selected) {
+		if (e.shiftKey) {
+			this.selection.deselect(card);
+		}
+	} else {
+		this.selection.select(card);
+	}
+	return this.selection.dragMove(e);
 };
 
 CardTable.prototype.onSync = function() {

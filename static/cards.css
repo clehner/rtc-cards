@@ -78,6 +78,14 @@ body {
 	background-color: #00aa00;
 }
 
+.selection-box {
+	z-index: 1000000;
+	position: absolute;
+	z-index: 1000000;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	background-color: rgba(200, 200, 200, 0.3);
+}
+
 /* cards */
 
 .card {
@@ -93,6 +101,11 @@ body {
 
 .card.held .front {
 	outline: 5px solid rgba(255, 255, 0, 0.75);
+}
+
+.selected.faceup .front, .selected.facedown .back {
+	outline: 2px dashed #ddd;
+	outline-offset: -1px;
 }
 
 .front, .back {

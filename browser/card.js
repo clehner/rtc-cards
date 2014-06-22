@@ -1,4 +1,7 @@
+var debounce = require('debounce');
+
 function Card(row, deck, table) {
+	this.id = row.id;
 	this.row = row;
 	this.deck = deck;
 	this.table = table;
@@ -16,6 +19,8 @@ function Card(row, deck, table) {
 	this.el.appendChild(this.backEl);
 
 	row.on('change', this.onChange.bind(this));
+
+	this.updatePosition = debounce(this.updatePosition, 50);
 }
 
 Card.prototype.suits = ['spades', 'diamonds', 'hearts', 'clubs'];
@@ -60,6 +65,7 @@ Card.prototype.updateFace = function() {
 };
 
 Card.prototype.setPosition = function(pos) {
+	this.position = pos;
 	this.x = pos.x;
 	this.y = pos.y;
 	this.z = pos.z;
@@ -98,7 +104,8 @@ Card.prototype.setHeld = function(held) {
 Card.prototype.updateClassname = function() {
 	this.el.className = 'card card-' + this.deck.id +
 		(this.faceup ? ' faceup' : ' facedown') +
-		(this.held ? ' held' : '');
+		(this.held ? ' held' : '') +
+		(this.selected ? ' selected' : '');
 };
 
 Card.prototype.updateOpacity = function() {
@@ -120,22 +127,33 @@ Card.prototype.onDragStart = function(e) {
 	this.prevMouse = e;
 };
 
-Card.prototype.onDrag = function(e) {
-	if (this.prevMouse) {
-		var dx = e.pageX - this.prevMouse.pageX;
-		var dy = e.pageY - this.prevMouse.pageY;
-		this.row.set('position', {
-			x: this.x + dx,
-			y: this.y + dy,
-			z: this.z
-		});
-	}
-	this.prevMouse = e;
+Card.prototype.moveBy = function(dx, dy) {
+	var position = {
+		x: this.x + dx,
+		y: this.y + dy,
+		z: this.z
+	};
+	this.setPosition(position);
+	this.updatePosition();
+};
+
+Card.prototype.updatePosition = function() {
+	this.row.set('position', this.position);
 };
 
 Card.prototype.onDragEnd = function(e, dragController) {
 	this.row.set('held', false);
 	dragController.setBehavior(this.table);
+};
+
+Card.prototype.select = function() {
+	this.selected = true;
+	this.updateClassname();
+};
+
+Card.prototype.deselect = function() {
+	this.selected = false;
+	this.updateClassname();
 };
 
 module.exports = Card;
