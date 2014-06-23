@@ -2,7 +2,7 @@
 
 Distributed collaborative environment for playing cards.
 
-A revival of the ideas of [https://code.google.com/p/wave-cards/](wave-cards)
+A revival of the ideas of [wave-cards](https://code.google.com/p/wave-cards/)
 
 ![screenshot](http://celehner.com/rtc-cards/static/screenshot.png)
 
