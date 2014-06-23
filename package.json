@@ -8,6 +8,7 @@
     "url": "git://github.com/clehner/rtc-cards.git"
   },
   "dependencies": {
+    "scuttlebutt": "^5.6.8",
     "crdt": "~3.6.4",
     "ws": "^0.4.31",
     "websocket-stream": "^0.5.1",
@@ -16,7 +17,8 @@
     "r-rtc": "~0.2.0",
     "rtc-dcstream": "^0.4.3",
     "yargs": "^1.2.5",
-    "debounce": "^1.0.0"
+    "debounce": "^1.0.0",
+    "random-seed": "^0.2.0"
   },
   "devDependencies": {
     "watchify": "^0.10.2",

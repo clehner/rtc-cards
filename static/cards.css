@@ -99,13 +99,19 @@ body {
 	-webkit-transition: -webkit-transform linear .25s;
 }
 
-.card.held .front {
-	outline: 5px solid rgba(255, 255, 0, 0.75);
+.card.held {
+	border: 5px solid rgba(255, 255, 0, 1);
+	border-radius: 3px;
+	margin: -5px;
 }
 
 .selected.faceup .front, .selected.facedown .back {
 	outline: 2px dashed #ddd;
 	outline-offset: -1px;
+}
+
+.selected.held .front, .selected.held .back {
+	outline-style: none;
 }
 
 .front, .back {

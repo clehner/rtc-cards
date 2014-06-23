@@ -3,13 +3,17 @@ var CardTable = require('./app').CardTable;
 var reconnectWS = require('reconnect-ws');
 var RTCChannelStream = require('rtc-dcstream');
 var Scuttlebucket = require('scuttlebucket');
+var u = require('scuttlebutt/util');
 var RRTC = require('r-rtc');
 
-var table;
-var tableModel = new Doc();
-var signalling = new RRTC();
+var idKey = 'rtc-cards_id';
+var id = sessionStorage[idKey] || (sessionStorage[idKey] = u.createId());
 
-var model = new Scuttlebucket()
+var table;
+var tableModel = new Doc(id);
+var signalling = new RRTC(id);
+
+var model = new Scuttlebucket(id)
 	.add('signalling', signalling)
 	.add('cards', tableModel);
 window.model = model;
@@ -39,7 +43,7 @@ signalling.on('peerconnection', function(id, peerConnection) {
 
 	dataChannel.addEventListener('open', function() {
 		//console.debug('channel opened');
-		console.log('stream', ++streams, 'opened', stream);
+		console.log('stream', ++streams, 'opened');
 		//table.setSynced(true);
 	}, false);
 
@@ -69,6 +73,7 @@ var wsRoot = 'ws' + m[1];
 var roomId = m[2];
 
 var ws = reconnectWS(function(stream) {
+	console.log('connected to websocket server');
 	stream.pipe(tableModel.createStream()).pipe(stream);
 });
 
@@ -87,8 +92,9 @@ xhr.send(null);
 
 /*
 reconnectWS(function(stream) {
+	console.log('connected to signalling socket');
 	stream.pipe(signalling.createStream()).pipe(stream);
-}).connect(root + '/signalling/2');
+}).connect(wsRoot + '/signalling/2');
 */
 
 /*

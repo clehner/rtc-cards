@@ -5,6 +5,7 @@ function Card(row, deck, table) {
 	this.row = row;
 	this.deck = deck;
 	this.table = table;
+	this.usersHeldBy = [];
 
 	this.el = document.createElement('div');
 	this.el._card = this;
@@ -18,7 +19,7 @@ function Card(row, deck, table) {
 	this.backEl.className = 'back';
 	this.el.appendChild(this.backEl);
 
-	row.on('change', this.onChange.bind(this));
+	row.on('update', this.onUpdate.bind(this));
 
 	this.updatePosition = debounce(this.updatePosition, 50);
 }
@@ -33,7 +34,9 @@ Card.prototype.rank = 0;
 Card.prototype.suit = 0;
 Card.prototype.faceup = false;
 
-Card.prototype.onChange = function(change) {
+Card.prototype.onUpdate = function(update, change) {
+	// source id that made this update
+	var authorId = update[2];
 	if (change.rank != null) {
 		this.rank = change.rank;
 	}
@@ -48,9 +51,6 @@ Card.prototype.onChange = function(change) {
 	}
 	if (change.faceup != null) {
 		this.setFaceup(change.faceup);
-	}
-	if (change.held != null) {
-		this.setHeld(change.held);
 	}
 };
 
@@ -91,16 +91,6 @@ Card.prototype.setFaceup = function(faceup) {
 	}
 };
 
-Card.prototype.setHeld = function(held) {
-	this.held = held;
-	this.updateClassname();
-	if (held) {
-		this.table.cardsHeld[this.row.id] = this;
-	} else {
-		delete this.table.cardsHeld[this.row.id];
-	}
-};
-
 Card.prototype.updateClassname = function() {
 	this.el.className = 'card card-' + this.deck.id +
 		(this.faceup ? ' faceup' : ' facedown') +
@@ -120,13 +110,6 @@ Card.prototype.toString = function() {
 	return this.ranks[this.rank] + ' of ' + this.suits[this.suit];
 };
 
-Card.prototype.onDragStart = function(e) {
-	e.preventDefault();
-	// TODO: show who is holding the card
-	this.row.set('held', true);
-	this.prevMouse = e;
-};
-
 Card.prototype.moveBy = function(dx, dy) {
 	var position = {
 		x: this.x + dx,
@@ -141,11 +124,6 @@ Card.prototype.updatePosition = function() {
 	this.row.set('position', this.position);
 };
 
-Card.prototype.onDragEnd = function(e, dragController) {
-	this.row.set('held', false);
-	dragController.setBehavior(this.table);
-};
-
 Card.prototype.select = function() {
 	this.selected = true;
 	this.updateClassname();
@@ -154,6 +132,30 @@ Card.prototype.select = function() {
 Card.prototype.deselect = function() {
 	this.selected = false;
 	this.updateClassname();
+};
+
+function getUserColor(user) {
+	return user.getColor();
+}
+
+Card.prototype.heldBy = function(user, held) {
+	var i = this.usersHeldBy.indexOf(user);
+	if (held == (i == -1)) {
+		if (held) this.usersHeldBy.push(user);
+		else this.usersHeldBy.splice(i, 1);
+	}
+	this.held = this.usersHeldBy.length > 0;
+	this.updateClassname();
+	if (this.held) {
+		// Arrange the colors of the border to show up to four users
+		// holding the card.
+		var users = this.usersHeldBy.slice(0, 4);
+		if (users.length == 2 || users.length == 3) users[2] = users[0];
+		if (users.length == 3) users[3] = users[1];
+
+		var color = users.map(getUserColor).join(' ');
+		this.el.style.borderColor = color;
+	}
 };
 
 module.exports = Card;

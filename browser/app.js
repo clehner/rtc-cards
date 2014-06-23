@@ -2,19 +2,24 @@ var DragController = require('./drag-controller');
 var KeyController = require('./key-controller');
 var Deck = require('./deck');
 var CardSelection = require('./selection');
+var User = require('./user');
 
 function CardTable(el, doc) {
 	this.el = el;
 	this.doc = doc;
 	this.cards = [];
 	this.decks = [];
-	this.cardsHeld = {};
+	this.cardsById = {};
+	this.users = {};
 
 	this.doc.on('sync', this.onSync.bind(this));
 
 	this.decksSet = this.doc.createSet('type', 'deck');
 	this.decksSet.on('add', this.onDeckRowAdded.bind(this));
 	this.decksSet.on('removed', console.log.bind(console, 'removed deck'));
+
+	this.userSet = this.doc.createSet('type', 'user');
+	this.userSet.on('add', this.onUserAdded.bind(this));
 
 	this.optionsBarEl = el.querySelector('.options-bar');
 	this.loaderEl = el.querySelector('.loader');
@@ -23,11 +28,10 @@ function CardTable(el, doc) {
 
 	this.decksEl = el.querySelector('.decks');
 
-	this.dragController = new DragController(this.cardsEl, this);
+	this.selection = new CardSelection(this, this.cardsEl);
+	this.dragController = new DragController(this.cardsEl, this.selection);
 	this.keyController = new KeyController(window, this);
 	this.cardsEl.oncontextmenu = this.onRightClick.bind(this);
-
-	this.selection = new CardSelection(this, this.cardsEl);
 }
 
 CardTable.prototype.getCardAtEl = function(el) {
@@ -49,6 +53,7 @@ CardTable.prototype.getCardAtPoint = function(x, y) {
 };
 
 CardTable.prototype.addCard = function(card) {
+	this.cardsById[card.id] = card;
 	this.cards.push(card);
 	this.cardsEl.appendChild(card.el);
 };
@@ -59,6 +64,22 @@ CardTable.prototype.onDeckRowAdded = function(row) {
 	this.decksEl.appendChild(deck.el);
 	// 'removed' doesn't seem to fire. detect removal in onChange
 	//row.on('removed', this.removeDeck.bind(this, deck));
+};
+
+CardTable.prototype.onUserAdded = function(row) {
+	if (row.id in this.users) return;
+	var user = new User(this, row);
+	this.users[row.id] = user;
+};
+
+CardTable.prototype.getMe = function() {
+	// delay adding this row so as to not clutter up the doc
+	return this.me || (this.me =
+		(this.users[this.doc.id] || (this.users[this.doc.id] =
+		new User(this, this.doc.add({
+			id: this.doc.id,
+			type: 'user'
+		})))));
 };
 
 CardTable.prototype.onClickAddDeck = function() {
@@ -85,12 +106,13 @@ CardTable.prototype.onKeyDown = {
 		}
 		*/
 	},
-	f: function() {
+	F: function() {
 		this.selection.flip();
 	}
 };
 
 CardTable.prototype.removeCard = function(card) {
+	delete this.cardsById[card.id];
 	var i = this.cards.indexOf(card);
 	if (i < 0) return;
 	this.cards.splice(i, 1);
@@ -104,27 +126,6 @@ CardTable.prototype.removeDeck = function(deck) {
 	this.decks.splice(i, 1);
 };
 
-CardTable.prototype.dragStart = function(e) {
-	e.preventDefault();
-	var card = this.getCardAtEl(e.target);
-	if (!card) {
-		// start selection box
-		if (!e.shiftKey) {
-			this.selection.clear();
-		}
-		return this.selection.dragSelect(e);
-	}
-	// move selection
-	if (card.selected) {
-		if (e.shiftKey) {
-			this.selection.deselect(card);
-		}
-	} else {
-		this.selection.select(card);
-	}
-	return this.selection.dragMove(e);
-};
-
 CardTable.prototype.onSync = function() {
 	// add extra delay to make sure initial updates don't get animated
 	setTimeout(this.setSynced.bind(this, true), 125);
@@ -135,6 +136,22 @@ CardTable.prototype.setSynced = function(synced) {
 	this.synced = synced;
 	this.el.classList.add(synced ? 'synced' : 'syncing');
 	this.el.classList.remove(synced ? 'syncing' : 'synced');
+};
+
+CardTable.prototype.setMyHeldCards = function(cardIds) {
+	this.getMe().setHeldCards(cardIds);
+};
+
+CardTable.prototype.userHoldsCards = function(user, cardIds, prevCardIds) {
+	var card, i;
+	for (i = 0; i < cardIds.length; i++) {
+		card = this.cardsById[cardIds[i]];
+		card.heldBy(user, true);
+	}
+	for (i = 0; i < prevCardIds.length; i++) {
+		card = this.cardsById[prevCardIds[i]];
+		card.heldBy(user, false);
+	}
 };
 
 module.exports = {
