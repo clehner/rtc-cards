@@ -64,7 +64,7 @@ signalling.on('peerconnection', function(id, peerConnection) {
 signalling.setState('active');
 
 var href = location.origin + location.pathname;
-var m = href.match(/^http(.*)\/room\/([^.])*/);
+var m = href.match(/^http(.*)\/room\/([^\/]*)/);
 if (!m) {
 	throw new Error('404 Not found');
 }
