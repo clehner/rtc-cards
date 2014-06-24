@@ -112,8 +112,8 @@ Card.prototype.toString = function() {
 
 Card.prototype.moveBy = function(dx, dy) {
 	var position = {
-		x: this.x + dx,
-		y: this.y + dy,
+		x: Math.round(this.x + dx),
+		y: Math.round(this.y + dy),
 		z: this.z
 	};
 	this.setPosition(position);
