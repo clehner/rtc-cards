@@ -75,6 +75,10 @@ var roomId = m[2];
 var ws = reconnectWS(function(stream) {
 	console.log('connected to websocket server');
 	stream.pipe(tableModel.createStream()).pipe(stream);
+}).on('disconnect', function() {
+  console.log('disconnected from websocket server');
+}).on('reconnect', function(n, delay) {
+  console.log('reconnect to websocket server', n, delay);
 });
 
 // bootstrap using xhr for fast load time
