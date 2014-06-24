@@ -32,6 +32,7 @@ S.clear = function() {
 S.dragStart = function(e) {
 	e.preventDefault();
 	var card = this.table.getCardAtEl(e.target);
+	//var card = this.table.getCardAtPoint(e._x, e._y);
 	if (!card) {
 		// start selection box
 		if (!e.shiftKey) {
