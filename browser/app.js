@@ -1,5 +1,6 @@
 var DragController = require('./drag-controller');
 var KeyController = require('./key-controller');
+var Card = require('./card');
 var Deck = require('./deck');
 var CardSelection = require('./selection');
 var User = require('./user');
@@ -41,12 +42,7 @@ CardTable.prototype.getCardAtEl = function(el) {
 };
 
 CardTable.prototype.getCardAtPoint = function(x, y) {
-	var cards = this.cards.filter(function(card) {
-		return x > card.x &&
-			y > card.y &&
-			(x <= card.x + card.deck.width) &&
-			(y <= card.y + card.deck.height);
-	});
+	var cards = this.cards.filter(Card.containsPoint(x, y));
 	return cards.length && cards.reduce(function(a, b) {
 		return a.z > b.z ? a : b;
 	});

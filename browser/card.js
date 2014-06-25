@@ -24,6 +24,12 @@ function Card(row, deck, table) {
 	this.updatePosition = debounce(this.updatePosition, 50);
 }
 
+Card.containsPoint = function(x, y) {
+	return function(card) {
+		return card.containsPoint(x, y);
+	};
+};
+
 Card.prototype.suits = ['spades', 'diamonds', 'hearts', 'clubs'];
 Card.prototype.ranks = ['ace', 'two', 'three', 'four', 'five', 'six', 'seven',
 	'eight', 'nine', 'ten', 'jack', 'queen', 'king', 'joker'];
@@ -156,6 +162,12 @@ Card.prototype.heldBy = function(user, held) {
 		var color = users.map(getUserColor).join(' ');
 		this.el.style.borderColor = color;
 	}
+};
+
+Card.prototype.containsPoint = function(x, y) {
+	return x > this.x && y > this.y &&
+		(x <= this.x + this.deck.width) &&
+		(y <= this.y + this.deck.height);
 };
 
 module.exports = Card;
