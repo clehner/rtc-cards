@@ -21,6 +21,11 @@ body {
 	color: white;
 }
 
+.footer {
+	text-align: center;
+	margin: .5em;
+}
+
 .loader {
 	float: right;
 	font-size: 2em;
